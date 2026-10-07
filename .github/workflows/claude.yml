@@ -12,12 +12,19 @@ on:
 
 jobs:
   claude:
+    # Only the repo owner can summon Claude. The action itself also requires write access; checking here
+    # too means strangers on a public repo can't even start a runner.
     if: |
-      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
-      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
-      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
-      (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
+      github.actor == github.repository_owner && (
+        (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
+        (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
+        (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
+        (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
+      )
     runs-on: ubuntu-latest
+    timeout-minutes: 60
+    # Claude pushes and opens PRs with the Claude GitHub App's own short-lived token (obtained via OIDC),
+    # so the workflow's GITHUB_TOKEN stays read-only.
     permissions:
       contents: read
       pull-requests: read
@@ -26,25 +33,31 @@ jobs:
       actions: read # Required for Claude to read CI results on PRs
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 1
 
+      # JDK + Gradle so Claude can build and test before pushing.
+      - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
+
       - name: Run Claude Code
         id: claude
-        uses: anthropics/claude-code-action@v1
+        uses: anthropics/claude-code-action@cfc3eb22bfed5c26ef66e3223c982af27e4524de # v1.0.231
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
 
-          # This is an optional setting that allows Claude to read CI results on PRs
           additional_permissions: |
             actions: read
 
-          # Optional: Give a custom prompt to Claude. If this is not specified, Claude will perform the instructions specified in the comment that tagged it.
-          # prompt: 'Update the pull request description to include a summary of changes.'
+          # Prompt-injection guard: only the owner's and Claude's own comments are fed to Claude,
+          # even when other people have commented on the issue or PR.
+          include_comments_by_actor: "${{ github.repository_owner }},claude[bot]"
 
-          # Optional: Add claude_args to customize behavior and configuration
-          # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
-          # or https://code.claude.com/docs/en/cli-reference for available options
-          # claude_args: '--allowed-tools Bash(gh pr *)'
-
+          claude_args: |
+            --allowedTools "Bash(./gradlew:*),Bash(gh pr create:*),Bash(gh pr view:*)"
+            --append-system-prompt "Before every push, run ./gradlew assembleDebug testDebugUnitTest lintDebug and fix any failures. When you were invoked from an issue (not a pull request), after pushing your branch open a pull request yourself with gh pr create against main, with a body that summarizes the change, explains how it was tested, and contains 'Closes #<issue number>'. Then reply with the PR link. You cannot modify files under .github/workflows; if a change there is needed, describe it in the PR body for the maintainer."

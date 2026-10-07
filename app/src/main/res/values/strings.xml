@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">DoIt</string>
+    <string name="placeholder_message">Nothing to do yet.</string>
+</resources>
