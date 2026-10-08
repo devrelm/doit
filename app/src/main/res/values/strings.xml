@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">DoIt</string>
-    <string name="placeholder_message">Nothing to do yet.</string>
+    <string name="now_tab_label">Now</string>
+    <string name="tasks_tab_label">Tasks</string>
+    <string name="nudges_tab_label">Nudges</string>
+    <string name="now_placeholder_message">Your three picks will show up here.</string>
+    <string name="tasks_placeholder_message">Your tasks will show up here.</string>
+    <string name="nudges_placeholder_message">Nudge settings will show up here.</string>
 </resources>
