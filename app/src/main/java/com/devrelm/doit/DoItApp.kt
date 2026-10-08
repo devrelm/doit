@@ -14,6 +14,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.devrelm.doit.navigation.TopLevelDestination
@@ -44,7 +45,9 @@ fun DoItApp() {
                         onClick = { selectedDestination = destination },
                         icon = {
                             Icon(
-                                imageVector = if (selected) destination.selectedIcon else destination.unselectedIcon,
+                                painter = painterResource(
+                                    id = if (selected) destination.selectedIconRes else destination.unselectedIconRes,
+                                ),
                                 contentDescription = stringResource(destination.labelRes),
                             )
                         },
