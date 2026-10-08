@@ -36,6 +36,10 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 1
+          # Don't leave GITHUB_TOKEN in git config. checkout v6+ stores it behind includeIf.gitdir, which
+          # claude-code-action doesn't clear, so git would push as github-actions[bot] with this job's
+          # read-only token (403) instead of the Claude App token the action sets on the remote.
+          persist-credentials: false
 
       # JDK + Gradle so Claude can build and test before pushing.
       - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
