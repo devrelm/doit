@@ -54,7 +54,8 @@ reads and follows.
 - **Never** use `pull_request_target` or `workflow_run` in a workflow that checks out PR code. They run with secrets.
 - **Never** give a PR-triggered workflow access to signing or Play credentials. Those live only in a protected
   GitHub *Environment* used by the release workflow (see [releasing.md](releasing.md)).
-- **Read before you `@claude` on someone else's issue.** Comment filtering doesn't cover the issue *body* itself.
+- **Read before you `@claude` on, or add `ready-for-dev` to, someone else's issue.** Comment filtering doesn't
+  cover the issue *body* itself.
   If a stranger files a good request, restate it in your own words (your own issue or comment) and point Claude at that.
 - **Review `claude[bot]` PRs as untrusted code.** Pay extra attention to build files (`*.gradle.kts`,
   `libs.versions.toml`, `gradle/wrapper/*`), new dependencies, and anything touching permissions in

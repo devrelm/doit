@@ -17,7 +17,9 @@ Every pull request also builds a debug APK, downloadable from the PR's **CI** ru
 
 Most changes are written by the [Claude GitHub Action](https://github.com/anthropics/claude-code-action):
 
-1. Open an issue describing what you want, mentioning `@claude` (only the repo owner can trigger it).
+1. Open an issue describing what you want. Start Claude on it by adding the `ready-for-dev` label, or by
+   mentioning `@claude` in the issue or a comment (only the repo owner can trigger it). To re-run an issue,
+   remove the label and add it again.
 2. Claude writes the code on a branch, builds and tests it, and opens a pull request.
 3. CI and an automated review run on the PR; the maintainer reviews, approves and merges.
 
