@@ -5,5 +5,6 @@
     <string name="nudges_tab_label">Nudges</string>
     <string name="now_placeholder_message">Your three picks will show up here.</string>
     <string name="tasks_placeholder_message">Your tasks will show up here.</string>
+    <string name="add_task_button_label">Add task</string>
     <string name="nudges_placeholder_message">Nudge settings will show up here.</string>
 </resources>
